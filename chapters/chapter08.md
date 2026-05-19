@@ -1,0 +1,99 @@
+# 第八章 聚类
+
+## 8.1 层次聚类
+
+```python
+from sklearn.cluster import AgglomerativeClustering
+import scipy.cluster.hierarchy as sch
+
+# 层次聚类
+hierarchical = AgglomerativeClustering(n_clusters=3, linkage='ward')
+labels = hierarchical.fit_predict(X)
+
+# 绘制树状图
+plt.figure(figsize=(12, 6))
+dendrogram = sch.dendrogram(sch.linkage(X, method='ward'))
+plt.title('层次聚类树状图')
+plt.show()
+```
+
+## 8.2 K-Means算法
+
+```python
+from sklearn.cluster import KMeans
+
+# K-Means聚类
+kmeans = KMeans(n_clusters=3, init='k-means++', random_state=42)
+labels = kmeans.fit_predict(X)
+
+# 肘部法则选择k
+inertia = []
+for k in range(1, 11):
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X)
+    inertia.append(kmeans.inertia_)
+
+plt.figure(figsize=(10, 6))
+plt.plot(range(1, 11), inertia, 'bo-')
+plt.xlabel('簇数k')
+plt.ylabel('惯性')
+plt.title('肘部法则')
+plt.show()
+```
+
+## 8.3 高斯混合模型（GMM）
+
+```python
+from sklearn.mixture import GaussianMixture
+
+# GMM聚类（软聚类）
+gmm = GaussianMixture(n_components=3, random_state=42)
+labels = gmm.fit_predict(X)
+probs = gmm.predict_proba(X)  # 概率矩阵
+
+print("各样本属于各簇的概率:")
+print(probs[:5])
+```
+
+## 8.4 DBSCAN
+
+```python
+from sklearn.cluster import DBSCAN
+
+# DBSCAN聚类（基于密度）
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+labels = dbscan.fit_predict(X)
+
+print(f"簇的数量: {len(set(labels)) - (1 if -1 in labels else 0)}")
+print(f"噪声点数量: {list(labels).count(-1)}")
+```
+
+## 8.5 OPTICS
+
+```python
+from sklearn.cluster import OPTICS
+
+# OPTICS聚类（改进的DBSCAN）
+optics = OPTICS(min_samples=5, xi=0.05, min_cluster_size=0.1)
+labels = optics.fit_predict(X)
+
+# 可达距离图
+plt.figure(figsize=(10, 6))
+plt.plot(optics.reachability_[optics.ordering_], marker='.', linestyle='None')
+plt.title('OPTICS可达距离图')
+plt.show()
+```
+
+## 8.6 谱聚类
+
+```python
+from sklearn.cluster import SpectralClustering
+
+# 谱聚类
+spectral = SpectralClustering(n_clusters=3, affinity='rbf', random_state=42)
+labels = spectral.fit_predict(X)
+```
+
+---
+
+[返回目录](../README.md)
